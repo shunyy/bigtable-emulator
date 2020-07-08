@@ -66,7 +66,7 @@ func createColumnFamiliies(specifications string, project string) error {
 		table := specificationElements[1]
 		columnFamily := specificationElements[2]
 
-		client, err := bigtable.NewAdminClient(ctx, "project", instance, option.WithGRPCConn(conn))
+		client, err := bigtable.NewAdminClient(ctx, project, instance, option.WithGRPCConn(conn))
 		if err != nil {
 			return fmt.Errorf("failed to create admin client: %v", err)
 		}
@@ -80,7 +80,7 @@ func createColumnFamiliies(specifications string, project string) error {
 
 		tableInfo, err := client.TableInfo(ctx, table)
 		if !columnFamilyExists(tableInfo.FamilyInfos, columnFamily) {
-			fmt.Printf("creating %v.%v.%v column family\n", instance, table, columnFamily)
+			fmt.Printf("creating %v.%v.%v column family(project = %s)\n", instance, table, columnFamily, project)
 			if err := client.CreateColumnFamily(ctx, table, columnFamily); err != nil {
 				return err
 			}
