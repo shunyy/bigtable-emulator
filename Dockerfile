@@ -1,24 +1,20 @@
-FROM golang:1.9-alpine3.6 as builder
+FROM golang:1.14 as builder
 
 MAINTAINER Julien Letrouit "julien.letrouit@shopify.com"
 
-RUN apk update && apk upgrade && apk add git && \
-    go get -u cloud.google.com/go/bigtable && \
-    go get -u github.com/stretchr/testify
-
-ADD *.go /go/bin/
+WORKDIR /go/src
+ADD . /go/src
 
 ENV BIGTABLE_EMULATOR_HOST=localhost:9035
 
-RUN go build /go/bin/bigtable-emulator.go && \
-    /go/bigtable-emulator & \
+RUN go build . && \
+    ./bigtable-emulator & \
     sleep 1 && \
-    go test -v /go/bin/bigtable-emulator_test.go
-
+    go test -v ./...
 
 FROM alpine:3.6
 
-COPY --from=builder /go/bigtable-emulator /
+COPY --from=builder /go/src/bigtable-emulator /
 
 ENTRYPOINT ["/bigtable-emulator"]
 
