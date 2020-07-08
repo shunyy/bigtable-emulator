@@ -7,7 +7,7 @@ ADD . /go/src
 
 ENV BIGTABLE_EMULATOR_HOST=localhost:9035
 
-RUN go build . && \
+RUN CGO_ENABLED=0 go build . && \
     ./bigtable-emulator & \
     sleep 1 && \
     go test -v ./...
